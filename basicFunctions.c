@@ -32,6 +32,8 @@
 #include "helpers.h"
 #include "basicFunctions.h"
 
+    char *modestr="";
+
 void basicFunctions() {
 
     char text[100];
@@ -61,12 +63,15 @@ void basicFunctions() {
         }
         if (strcmp(TXbuffer,"page DMR")==0) {
             page=2;
+            modestr="DMR";
         }
         if (strcmp(TXbuffer,"page YSF")==0) {
             page=3;
+            modestr="YSF";
         }
         if (strcmp(TXbuffer,"page P25")==0) {
             page=4;
+            modestr="P25";
         }
         if (strcmp(TXbuffer,"page NXDN")==0) {
             page=5;
@@ -74,6 +79,7 @@ void basicFunctions() {
         if (strcmp(TXbuffer,"page POCSAG")==0) {
             page=6;
         }
+
     }
 
     if ((strncmp(TXbuffer,"page ",5)==0)&&(changepages==1)) {
@@ -120,6 +126,12 @@ void basicFunctions() {
         if (p==NULL) p=strstr(TXbuffer,"t3");
         if ((p!=NULL)&&(p[7]==61)&&((p[2]&48)==48)) { TXbuffer[0]=0; return; }
     }
+    if ((page==0)&&(strstr(TXbuffer,"t2.txt=")>0)&&(check++>100)&&(modestr!=NULL)) {
+    
+            sprintf(text,"t35.txt=\"%s\"",modestr);
+            sendCommand(text);
+     }
+
     if (((page==0)&&(strstr(TXbuffer,"t2.txt=")!=NULL)&&(check%8==1))||(strstr(TXbuffer,"status.val=17")!=NULL)) {
         FILE *deviceInfoFile;
         double val;
@@ -139,6 +151,12 @@ void basicFunctions() {
             fclose(deviceInfoFile);
         }
         sendCommand(text);
+
+	// Digital Mode
+	if (modestr!=NULL) {
+	  sprintf(text, "t35.txt=\"%s\"", modestr);
+          sendCommand(text);
+	}
 
        //CPU frequency
         deviceInfoFile = fopen ("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq", "r");
@@ -240,8 +258,8 @@ void basicFunctions() {
         sprintf(text, "MMDVM.status.val=24");
         sendCommand(text);
         sendCommand("click S0,1");
-    }
 
+    }
 
     //send TG name if found (Slot 1)
     if ((page==2)&&(strstr(TXbuffer,"t1.txt")!=NULL)&&(TXbuffer[8]!='"')) {
@@ -292,6 +310,7 @@ void basicFunctions() {
             sprintf(TXbuffer,"t8.txt=\"TG%d name not found\"",nr);
         }
         sendCommand(TXbuffer);
+
     }
 
     const char showOn[] = {0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00, 0x00, 0x0, 0x0, 0x0, 0x0, 0x0 };
@@ -333,6 +352,7 @@ void basicFunctions() {
             sendCommand(TXbuffer);
             sprintf(TXbuffer,"t22.txt=\"%s\"",users[user].data5);
             sendCommand(TXbuffer);
+
         } else {
             sprintf(TXbuffer,"t18.txt=\"DMRID %s\"",text);
             sendCommand(TXbuffer);

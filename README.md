@@ -1,30 +1,3 @@
-
-NextionDriver (for MMDVMHost) by ON7LDS Version 1.25 Repair by VE3RD
-=======================================
-
-The current NextionDriver ver 1.25 by ON7LDS has a few minor errors
-The location detail for DMR TS1 or any other modes is broken
-The following are the changes I made to mske this code work
-
-The Why
-There are two sections of code to lookup location detail. One for DMR TS2 and one for everything else
-DMR TS2 uses T2=2 N CallSign
-DMR TS1 uses T0=1 N CallSign
-P25,YSF and NXDN use T0=N CallSign
-The buffer configuration for DMR is TXbuffer[12] to grab the Callsign from position 12
-The buffer for the other modes needs to be TXbuffer[10] not TXbuffer[12] to grab the Callsign from position 10
-This creates a conflick between DM TS1 and the other modes
-
-The What
-I added a logic element to stop the other modes block from processing if the mode was DMR and changed all the TXbuffer[12]s TXbuffer[10] in that block.
-I duplicated the DMR block for TS2 and adjusted it for TS1
-
-The When
-This is a TEMPORARY fix for the ON7LDS Driver that will dissapear when ON7LDS posts a repaired version of his NextionDriver
-I have set the version number to R1.25
-
-Phil VE3RD
-
 NextionDriver (for MMDVMHost) by ON7LDS
 =======================================
 
